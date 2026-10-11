@@ -1,0 +1,355 @@
+<!DOCTYPE html>
+<html lang="en" data-theme="coquette" data-appearance="light">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+    <meta name="description" content="Blush Calculator — a luxury coquette calculator with elegant design, three themes, history and keyboard support.">
+    <meta name="theme-color" content="#f4c6d7">
+    <title>Blush Calculator | Luxury Coquette Calculator</title>
+
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,300;0,400;0,500;0,600;1,400&family=DM+Sans:opsz,wght@9..40,300;9..40,400;9..40,500;9..40,600;9..40,700&display=swap" rel="stylesheet">
+
+    <!-- Restore saved preferences before first paint (prevents theme flash) -->
+    <script>
+        (function () {
+            try {
+                var s = JSON.parse(localStorage.getItem('blush:settings') || '{}');
+                var root = document.documentElement;
+                var app = s.appearance === 'auto' || !s.appearance
+                    ? (window.matchMedia && window.matchMedia('(prefers-color-scheme: dark)').matches ? 'dark' : 'light')
+                    : (s.appearance === 'dark' ? 'dark' : 'light');
+                root.setAttribute('data-theme', s.theme || 'coquette');
+                root.setAttribute('data-appearance', app);
+                if (s.reducedMotion) root.setAttribute('data-reduced-motion', 'true');
+            } catch (e) { /* storage unavailable — defaults stay in place */ }
+        })();
+    </script>
+
+    <link rel="stylesheet" href="style.css">
+</head>
+<body>
+    <div class="app-container">
+        <!-- Ambient background: soft pink light, grain and floating petals -->
+        <div class="ambient" aria-hidden="true">
+            <span class="ambient-glow glow-1"></span>
+            <span class="ambient-glow glow-2"></span>
+            <span class="ambient-glow glow-3"></span>
+            <span class="ambient-grain"></span>
+            <div class="floating-particles" id="floatingParticles"></div>
+        </div>
+
+        <!-- Floating quick controls -->
+        <button class="float-btn" id="themeFloatToggle" aria-label="Open theme selector" aria-haspopup="dialog">
+            <svg viewBox="0 0 24 24" width="22" height="22" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+                <path d="M12 3l1.8 4.4L18.2 9.2l-4.4 1.8L12 15.4l-1.8-4.4L5.8 9.2l4.4-1.8L12 3z"/>
+                <path d="M18.5 14.5l.9 2.1 2.1.9-2.1.9-.9 2.1-.9-2.1-2.1-.9 2.1-.9.9-2.1z"/>
+            </svg>
+            <span class="float-tip">Themes</span>
+        </button>
+
+        <button class="float-btn" id="settingsFloatToggle" aria-label="Open settings" aria-haspopup="dialog">
+            <svg viewBox="0 0 24 24" width="22" height="22" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+                <circle cx="12" cy="12" r="3"/>
+                <path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 1 1-2.83 2.83l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 1 1-4 0v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 1 1-2.83-2.83l.06-.06a1.65 1.65 0 0 0 .33-1.82 1.65 1.65 0 0 0-1.51-1H3a2 2 0 1 1 0-4h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 1 1 2.83-2.83l.06.06A1.65 1.65 0 0 0 9 4.6a1.65 1.65 0 0 0 1-1.51V3a2 2 0 1 1 4 0v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 1 1 2.83 2.83l-.06.06A1.65 1.65 0 0 0 19.4 9v.09a1.65 1.65 0 0 0 1.51 1H21a2 2 0 1 1 0 4h-.09a1.65 1.65 0 0 0-1.51 1z"/>
+            </svg>
+            <span class="float-tip">Settings</span>
+        </button>
+
+        <!-- ======================= Calculator ======================= -->
+        <main class="calculator-card" aria-label="Blush Calculator">
+            <header class="card-header">
+                <div class="brand">
+                    <span class="brand-mark" aria-hidden="true">
+                        <svg class="bow" viewBox="0 0 64 48" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round">
+                            <path d="M32 21C25.5 9.5 13 7.5 9.5 14.5 6.2 21.2 14.5 27.5 25.5 24.5"/>
+                            <path d="M32 21C38.5 9.5 51 7.5 54.5 14.5 57.8 21.2 49.5 27.5 38.5 24.5"/>
+                            <path d="M28.5 18.5C28.5 16.2 35.5 16.2 35.5 18.5L35.5 26.5C35.5 28.8 28.5 28.8 28.5 26.5Z"/>
+                            <path d="M29.5 27.5C27.5 33 25.5 37.5 21.5 43"/>
+                            <path d="M34.5 27.5C36.5 33 38.5 37.5 42.5 43"/>
+                        </svg>
+                        <i class="mark-sparkle spark-a">✦</i>
+                        <i class="mark-sparkle spark-b">✧</i>
+                    </span>
+                    <span class="brand-text">
+                        <h1 class="brand-name">Blush Calculator</h1>
+                        <p class="brand-tagline">elegant calculations</p>
+                    </span>
+                </div>
+
+                <div class="header-actions">
+                    <button class="icon-btn" id="historyToggle" aria-label="Toggle calculation history" aria-expanded="false" aria-controls="historyPanel" title="History">
+                        <svg viewBox="0 0 24 24" width="20" height="20" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+                            <path d="M3 3v5h5"/>
+                            <path d="M3.05 13A9 9 0 1 0 6 5.3L3 8"/>
+                            <path d="M12 7.5V12l3.5 2"/>
+                        </svg>
+                    </button>
+                    <button class="icon-btn" id="copyResult" aria-label="Copy current result" title="Copy result">
+                        <svg class="icon-copy" viewBox="0 0 24 24" width="20" height="20" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+                            <rect x="9" y="9" width="12" height="12" rx="2.5"/>
+                            <path d="M5.5 15H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h8a2 2 0 0 1 2 2v.5"/>
+                        </svg>
+                        <svg class="icon-check" viewBox="0 0 24 24" width="20" height="20" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+                            <polyline points="20 6 9 17 4 12"/>
+                        </svg>
+                    </button>
+                </div>
+            </header>
+
+            <!-- Display -->
+            <section class="display" aria-label="Calculator display">
+                <div class="display-inner">
+                    <p class="display-history" id="historyLine" aria-live="polite" aria-atomic="true">&nbsp;</p>
+                    <p class="display-value" id="mainDisplay" role="status" aria-live="assertive" aria-atomic="true">0</p>
+                </div>
+                <span class="display-shine" aria-hidden="true"></span>
+            </section>
+
+            <!-- Keypad -->
+            <div class="keypad" role="group" aria-label="Calculator keypad">
+                <div class="key-row">
+                    <button class="key key--fn key--clear" data-action="clear" aria-label="AC, clear all" aria-keyshortcuts="Escape">
+                        <span class="key-text">AC</span>
+                    </button>
+                    <button class="key key--fn key--back" data-action="backspace" aria-label="Delete last character" aria-keyshortcuts="Backspace">
+                        <svg viewBox="0 0 24 24" width="21" height="21" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+                            <path d="M21 5H8.5L2.5 12l6 7H21a1.5 1.5 0 0 0 1.5-1.5v-11A1.5 1.5 0 0 0 21 5z"/>
+                            <path d="M17.5 9.5l-5 5M12.5 9.5l5 5"/>
+                        </svg>
+                    </button>
+                    <button class="key key--fn" data-action="paren" aria-label="( ) insert parentheses" aria-keyshortcuts="( )">
+                        <span class="key-text">( )</span>
+                    </button>
+                    <button class="key key--op" data-action="op" data-value="/" aria-label="Divide" aria-keyshortcuts="/">
+                        <svg viewBox="0 0 24 24" width="22" height="22" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" aria-hidden="true">
+                            <path d="M6 12h12"/><circle cx="12" cy="6.5" r="1.3" fill="currentColor" stroke="none"/><circle cx="12" cy="17.5" r="1.3" fill="currentColor" stroke="none"/>
+                        </svg>
+                    </button>
+                </div>
+
+                <div class="key-row">
+                    <button class="key key--num" data-value="7" aria-label="7" aria-keyshortcuts="7">7</button>
+                    <button class="key key--num" data-value="8" aria-label="8" aria-keyshortcuts="8">8</button>
+                    <button class="key key--num" data-value="9" aria-label="9" aria-keyshortcuts="9">9</button>
+                    <button class="key key--op" data-action="op" data-value="*" aria-label="Multiply" aria-keyshortcuts="*">
+                        <svg viewBox="0 0 24 24" width="22" height="22" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" aria-hidden="true">
+                            <path d="M17.5 17.5l-11-11M6.5 17.5l11-11"/>
+                        </svg>
+                    </button>
+                </div>
+
+                <div class="key-row">
+                    <button class="key key--num" data-value="4" aria-label="4" aria-keyshortcuts="4">4</button>
+                    <button class="key key--num" data-value="5" aria-label="5" aria-keyshortcuts="5">5</button>
+                    <button class="key key--num" data-value="6" aria-label="6" aria-keyshortcuts="6">6</button>
+                    <button class="key key--op" data-action="op" data-value="-" aria-label="Subtract" aria-keyshortcuts="-">
+                        <svg viewBox="0 0 24 24" width="22" height="22" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" aria-hidden="true">
+                            <path d="M6 12h12"/>
+                        </svg>
+                    </button>
+                </div>
+
+                <div class="key-row">
+                    <button class="key key--num" data-value="1" aria-label="1" aria-keyshortcuts="1">1</button>
+                    <button class="key key--num" data-value="2" aria-label="2" aria-keyshortcuts="2">2</button>
+                    <button class="key key--num" data-value="3" aria-label="3" aria-keyshortcuts="3">3</button>
+                    <button class="key key--op" data-action="op" data-value="+" aria-label="Add" aria-keyshortcuts="+">
+                        <svg viewBox="0 0 24 24" width="22" height="22" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" aria-hidden="true">
+                            <path d="M12 6v12M6 12h12"/>
+                        </svg>
+                    </button>
+                </div>
+
+                <div class="key-row">
+                    <button class="key key--fn" data-action="percent" aria-label="% percentage" aria-keyshortcuts="%">
+                        <span class="key-text">%</span>
+                    </button>
+                    <button class="key key--fn" data-action="negate" aria-label="+/− change sign">
+                        <span class="key-text">+/−</span>
+                    </button>
+                    <button class="key key--num" data-value="0" aria-label="0" aria-keyshortcuts="0">0</button>
+                    <button class="key key--num" data-action="decimal" aria-label=". decimal point" aria-keyshortcuts=".">.</button>
+                </div>
+
+                <div class="key-row key-row--equals">
+                    <button class="key key--equals" data-action="equals" aria-label="= equals, calculate result" aria-keyshortcuts="Enter =">
+                        <span class="key-text">=</span>
+                        <span class="equals-glint" aria-hidden="true"></span>
+                    </button>
+                </div>
+            </div>
+
+            <p class="keypad-hint" aria-hidden="true">
+                <kbd>Enter</kbd> equals · <kbd>Esc</kbd> clear · <kbd>⌫</kbd> delete
+            </p>
+
+            <!-- History -->
+            <aside class="history" id="historyPanel" aria-label="Calculation history" hidden>
+                <div class="history-head">
+                    <h2 class="history-title">
+                        <svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+                            <path d="M3 3v5h5"/><path d="M3.05 13A9 9 0 1 0 6 5.3L3 8"/><path d="M12 7.5V12l3.5 2"/>
+                        </svg>
+                        History
+                    </h2>
+                    <button class="icon-btn icon-btn--sm" id="historyClear" aria-label="Clear all history" title="Clear history">
+                        <svg viewBox="0 0 24 24" width="17" height="17" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+                            <path d="M3 6h18M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"/>
+                        </svg>
+                    </button>
+                </div>
+                <ul class="history-list" id="historyList"></ul>
+                <div class="history-empty" id="historyEmpty">
+                    <span class="empty-bow" aria-hidden="true">
+                        <svg viewBox="0 0 64 48" width="46" height="34" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round">
+                            <path d="M32 21C25.5 9.5 13 7.5 9.5 14.5 6.2 21.2 14.5 27.5 25.5 24.5"/>
+                            <path d="M32 21C38.5 9.5 51 7.5 54.5 14.5 57.8 21.2 49.5 27.5 38.5 24.5"/>
+                            <path d="M28.5 18.5C28.5 16.2 35.5 16.2 35.5 18.5L35.5 26.5C35.5 28.8 28.5 28.8 28.5 26.5"/>
+                            <path d="M29.5 27.5C27.5 33 25.5 37.5 21.5 43"/>
+                            <path d="M34.5 27.5C36.5 33 38.5 37.5 42.5 43"/>
+                        </svg>
+                    </span>
+                    <p class="empty-title">No calculations yet</p>
+                    <p class="empty-sub">Your elegant little history will appear here</p>
+                </div>
+            </aside>
+        </main>
+
+        <!-- ======================= Theme modal ======================= -->
+        <div class="overlay" id="themeModal" role="dialog" aria-modal="true" aria-labelledby="themeModalTitle" hidden>
+            <div class="modal modal--theme">
+                <header class="modal-head">
+                    <div>
+                        <h2 id="themeModalTitle" class="modal-title">Choose your theme</h2>
+                        <p class="modal-sub">Saved automatically on this device</p>
+                    </div>
+                    <button class="modal-close" data-close="themeModal" aria-label="Close theme selector">
+                        <svg viewBox="0 0 24 24" width="20" height="20" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" aria-hidden="true"><path d="M18 6L6 18M6 6l12 12"/></svg>
+                    </button>
+                </header>
+
+                <div class="theme-grid" role="radiogroup" aria-label="Theme options">
+                    <button class="theme-card" data-theme-value="coquette" role="radio" aria-checked="true" tabindex="0">
+                        <span class="theme-preview preview--coquette" aria-hidden="true">
+                            <i class="dot d1"></i><i class="dot d2"></i><i class="dot d3"></i>
+                        </span>
+                        <span class="theme-meta">
+                            <span class="theme-name">Coquette Pink</span>
+                            <span class="theme-desc">Blush · rose · ivory</span>
+                        </span>
+                        <span class="theme-tick" aria-hidden="true">
+                            <svg viewBox="0 0 24 24" width="14" height="14" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg>
+                        </span>
+                    </button>
+
+                    <button class="theme-card" data-theme-value="vanilla" role="radio" aria-checked="false" tabindex="-1">
+                        <span class="theme-preview preview--vanilla" aria-hidden="true">
+                            <i class="dot d1"></i><i class="dot d2"></i><i class="dot d3"></i>
+                        </span>
+                        <span class="theme-meta">
+                            <span class="theme-name">Vanilla Cream</span>
+                            <span class="theme-desc">Cream · champagne · caramel</span>
+                        </span>
+                        <span class="theme-tick" aria-hidden="true">
+                            <svg viewBox="0 0 24 24" width="14" height="14" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg>
+                        </span>
+                    </button>
+
+                    <button class="theme-card" data-theme-value="midnight" role="radio" aria-checked="false" tabindex="-1">
+                        <span class="theme-preview preview--midnight" aria-hidden="true">
+                            <i class="dot d1"></i><i class="dot d2"></i><i class="dot d3"></i>
+                        </span>
+                        <span class="theme-meta">
+                            <span class="theme-name">Midnight Rose</span>
+                            <span class="theme-desc">Burgundy · rose · rose-gold</span>
+                        </span>
+                        <span class="theme-tick" aria-hidden="true">
+                            <svg viewBox="0 0 24 24" width="14" height="14" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg>
+                        </span>
+                    </button>
+                </div>
+
+                <div class="appearance-row">
+                    <span class="appearance-label">Appearance</span>
+                    <div class="segmented" role="radiogroup" aria-label="Appearance mode">
+                        <button class="seg" data-appearance-value="light" role="radio" aria-checked="true" tabindex="0">Light</button>
+                        <button class="seg" data-appearance-value="dark" role="radio" aria-checked="false" tabindex="-1">Dark</button>
+                        <button class="seg" data-appearance-value="auto" role="radio" aria-checked="false" tabindex="-1">Auto</button>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- ======================= Settings modal ======================= -->
+        <div class="overlay" id="settingsModal" role="dialog" aria-modal="true" aria-labelledby="settingsModalTitle" hidden>
+            <div class="modal modal--settings">
+                <header class="modal-head">
+                    <div>
+                        <h2 id="settingsModalTitle" class="modal-title">Settings</h2>
+                        <p class="modal-sub">Fine-tune your experience</p>
+                    </div>
+                    <button class="modal-close" data-close="settingsModal" aria-label="Close settings">
+                        <svg viewBox="0 0 24 24" width="20" height="20" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" aria-hidden="true"><path d="M18 6L6 18M6 6l12 12"/></svg>
+                    </button>
+                </header>
+
+                <div class="settings-body">
+                    <section class="settings-group">
+                        <h3 class="group-title">Appearance</h3>
+                        <div class="setting">
+                            <span class="setting-info">
+                                <span class="setting-label">Reduced motion</span>
+                                <span class="setting-desc">Calm the animations and transitions</span>
+                            </span>
+                            <button class="switch" id="reducedMotion" role="switch" aria-checked="false" aria-label="Reduced motion"><span class="knob"></span></button>
+                        </div>
+                        <div class="setting">
+                            <span class="setting-info">
+                                <span class="setting-label">Haptic feedback</span>
+                                <span class="setting-desc">A tiny buzz on supported devices</span>
+                            </span>
+                            <button class="switch" id="hapticFeedback" role="switch" aria-checked="true" aria-label="Haptic feedback"><span class="knob"></span></button>
+                        </div>
+                    </section>
+
+                    <section class="settings-group">
+                        <h3 class="group-title">Sound</h3>
+                        <div class="setting">
+                            <span class="setting-info">
+                                <span class="setting-label">Sound effects</span>
+                                <span class="setting-desc">Soft key tones · off by default</span>
+                            </span>
+                            <button class="switch" id="soundEffects" role="switch" aria-checked="false" aria-label="Sound effects"><span class="knob"></span></button>
+                        </div>
+                        <div class="setting">
+                            <span class="setting-info">
+                                <span class="setting-label">Volume</span>
+                                <span class="setting-desc">Adjust the tone loudness</span>
+                            </span>
+                            <input class="range" type="range" id="soundVolume" min="0" max="100" value="35" aria-label="Sound volume">
+                        </div>
+                    </section>
+
+                    <section class="settings-group">
+                        <h3 class="group-title">Data</h3>
+                        <div class="setting">
+                            <span class="setting-info">
+                                <span class="setting-label">Reset everything</span>
+                                <span class="setting-desc">Clears history, themes and preferences</span>
+                            </span>
+                            <button class="btn-danger" id="clearAllData">Reset</button>
+                        </div>
+                    </section>
+                </div>
+            </div>
+        </div>
+
+        <!-- Toasts -->
+        <div class="toasts" id="toastContainer" role="status" aria-live="polite"></div>
+    </div>
+
+    <script src="script.js"></script>
+</body>
+</html>
